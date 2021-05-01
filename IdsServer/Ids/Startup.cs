@@ -1,4 +1,5 @@
 using System.Reflection;
+using Ids.Data;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -25,6 +26,10 @@ namespace Ids
         {
             var connectionString = _configuration.GetConnectionString("DefaultConnection");
             var migrationsAssembly = typeof(Startup).GetTypeInfo().Assembly.GetName().Name;
+
+            services.AddDbContext<ApplicationDbContext>(options =>
+                options.UseSqlite(connectionString, sqlOptions =>
+                    sqlOptions.MigrationsAssembly(migrationsAssembly)));
 
             services.AddIdentityServer()
                 .AddTestUsers(Config.Users)
