@@ -2,6 +2,7 @@ using System.Reflection;
 using Ids.Data;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -30,9 +31,12 @@ namespace Ids
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlite(connectionString, sqlOptions =>
                     sqlOptions.MigrationsAssembly(migrationsAssembly)));
+            
+            services.AddIdentity<IdentityUser, IdentityRole>()
+                .AddEntityFrameworkStores<ApplicationDbContext>();
 
             services.AddIdentityServer()
-                .AddTestUsers(Config.Users)
+                .AddAspNetIdentity<IdentityUser>()
                 .AddConfigurationStore(options =>
                 {
                     options.ConfigureDbContext = builder => builder.UseSqlite(connectionString,
