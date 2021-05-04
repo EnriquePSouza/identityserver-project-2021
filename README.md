@@ -1,2 +1,2 @@
-# identityserver-project-2021
-Project created to study the Identity Server.
+# identityserver-studies-2021
+Repository created to study the Identity Server.
