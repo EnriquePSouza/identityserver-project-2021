@@ -12,18 +12,35 @@ namespace IdentityExample
     {
         public void ConfigureServices(IServiceCollection services)
         {
+            // Essa e a config abaixo, possuem a mesma configuração que o addSingleton,
+            // Só que essas configurações fornecem suas proprias classes.
             // Com essa configuração vc consegue injetar as infos do context em qualquer lugar da aplicação.
-            services.AddDbContext<AppDbContext>(config => {
+            services.AddDbContext<AppDbContext>(config => 
+            {
                 config.UseInMemoryDatabase("Memory");
             });
 
             // Registra um conjunto de repositorios/serviços .
             // repositorios = É uma coleção de funções/interfaces que abstraem sua chamadas para o banco de dados.
             // Com esse registro vc possibilita a injeção de dependencia desses itens nos controllers.
-            services.AddIdentity<IdentityUser, IdentityRole>()
-            .AddEntityFrameworkStores<AppDbContext>() // Configura com qual database o identity vai se comunicar.
+            services.AddIdentity<IdentityUser, IdentityRole>(config => 
+            {
+                // Configurações para remover as configs padrões de password e adicionar as suas.
+                config.Password.RequiredLength = 4;
+                config.Password.RequireDigit = false;
+                config.Password.RequireNonAlphanumeric = false;
+                config.Password.RequireUppercase = false;
+            })
+                .AddEntityFrameworkStores<AppDbContext>() // Configura com qual database o identity vai se comunicar.
                 .AddDefaultTokenProviders();
 
+            services.ConfigureApplicationCookie(config =>
+            {
+                config.Cookie.Name = "Identity.Cookie";
+                config.LoginPath = "/Home/Login";
+            });
+
+            // ESSA CONFIG NÃO PODE SER USADA COMO 'DEFAULT' PQ AGORA A DEFAULT É A CONFIG DO IDENTITY.
             // services.AddAuthentication("CookieAuth")
             //     .AddCookie("CookieAuth", config =>
             //     {
