@@ -3,13 +3,22 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using NETCore.MailKit.Extensions;
+using NETCore.MailKit.Infrastructure.Internal;
 
 namespace IdentityExample
 {
     public class Startup
     {
+        private readonly IConfiguration _config;
+
+        public Startup(IConfiguration config)
+        {
+            _config = config;
+        }
         public void ConfigureServices(IServiceCollection services)
         {
             // Essa e a config abaixo, possuem a mesma configuração que o addSingleton,
@@ -30,6 +39,7 @@ namespace IdentityExample
                 config.Password.RequireDigit = false;
                 config.Password.RequireNonAlphanumeric = false;
                 config.Password.RequireUppercase = false;
+                config.SignIn.RequireConfirmedEmail = true; // Não deixa o ususário acessar até confirmar o e-mail.
             })
                 .AddEntityFrameworkStores<AppDbContext>() // Configura com qual database o identity vai se comunicar.
                 .AddDefaultTokenProviders();
@@ -40,16 +50,9 @@ namespace IdentityExample
                 config.LoginPath = "/Home/Login";
             });
 
-            // ESSA CONFIG NÃO PODE SER USADA COMO 'DEFAULT' PQ AGORA A DEFAULT É A CONFIG DO IDENTITY.
-            // services.AddAuthentication("CookieAuth")
-            //     .AddCookie("CookieAuth", config =>
-            //     {
-            //         // Como não tenho esse cookie criado, ele permite a ação ser axecutada, 
-            //         // pois não tem nada aprovando ou recusando tal autorização.
-            //         config.Cookie.Name = "Grandmas.Cookie";
-            //         // Redireciona sempre que tiver a tag 'authorize' e precisa de aprovação.
-            //         config.LoginPath = "/Home/Authenticate";
-            //     });
+            // Essa linha configura o envio de email, a 'section' do appsettings, 
+            // no mundo real, precisa das infos de segurança do objeto 'MailKitOptions'.
+            services.AddMailKit(config => config.UseMailKit(_config.GetSection("Email").Get<MailKitOptions>()));
 
             services.AddControllersWithViews();
         }
