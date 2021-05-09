@@ -17,7 +17,19 @@ namespace Basics.Controllers
         public IActionResult Secret()
         {
             return View();   
+        }
+
+        [Authorize(Policy = "Claim.DoB")]
+        public IActionResult SecretPolicy()
+        {
+            return View("Secret");   
         }   
+
+        [Authorize(Roles = "Admin")] 
+        public IActionResult SecretRole()
+        {
+            return View("Secret");   
+        } 
 
         public IActionResult Authenticate()
         {
@@ -27,6 +39,8 @@ namespace Basics.Controllers
             {
                 new Claim(ClaimTypes.Name, "Bob"),
                 new Claim(ClaimTypes.Email, "Bob@fmail.com"),
+                new Claim(ClaimTypes.DateOfBirth, "11/11/2000"), // Modelo de autenticação amis novo, é oq eu fiz baseado na data.
+                new Claim(ClaimTypes.Role, "Admin"), // Role é algo antigo, o atual é usar claim, com uma condição especifica do banco.
                 new Claim("Grandma.Says", "Very nice boy."), // Quando vc quiser uma claim unica, faça assim.
             };
 

@@ -1,7 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
+using Basics.AuthorizationRequirements;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -26,6 +29,34 @@ namespace Basics
                     config.LoginPath = "/Home/Authenticate";
                 });
 
+            // Quando vc declara que algo precisa ser authenticado, é essa configuração que acontece no background.
+            // A config comentada.
+            services.AddAuthorization(config =>
+            {
+            //     var defaultAuthBuilder = new AuthorizationPolicyBuilder();
+            //     var defaultAuthPolicy = defaultAuthBuilder
+            //         .RequireAuthenticatedUser()
+            //         .RequireClaim(ClaimTypes.DateOfBirth)
+            //         .Build();
+                
+            //     config.DefaultPolicy = defaultAuthPolicy;
+
+            //     config.AddPolicy("Claim.DoB", policyBuilder =>
+            //     {
+            //         policyBuilder.RequireClaim(ClaimTypes.DateOfBirth);
+            //     });
+
+                // Role é legado, só se a empresa utilizar, hoje em dia utilizamos uma condição em cima de dados das claims do usuario.
+                config.AddPolicy("Admin", policyBuilder => policyBuilder.RequireClaim(ClaimTypes.Role, "Admin"));
+
+                config.AddPolicy("Claim.DoB", policyBuilder =>
+                {
+                    policyBuilder.RequireCustomClaim(ClaimTypes.DateOfBirth);
+                });
+            });
+
+            services.AddScoped<IAuthorizationHandler, CustomRequireClaimHandler>();
+
             // Para poder chamar as views, a parte de front-end apartir dos controllers.
             // Só declarar o controller com a Herança Controller e não ControllerBase.
             services.AddControllersWithViews();
@@ -46,7 +77,7 @@ namespace Basics
 
             // Verifica se o usuário possui acesso, após verificar a rota e antes de acessar o endereço final.
             // Depois Pergunta se vc está aprovado.
-            app.UseAuthorization(); 
+            app.UseAuthorization(); // Quando chega aqui ele vai pra configuração la em cima e verifica a autorização e a politica.
 
             // Ao bater aqui, verifica os controlladores e vê se o que eu solicitei está apontado neles.
             app.UseEndpoints(endpoints =>
