@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Basics.CustomPolicyProvider;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -39,6 +40,18 @@ namespace Basics.Controllers
             return View("Secret");   
         } 
 
+        [SecurityLevel(5)] 
+        public IActionResult SecretLevel()
+        {
+            return View("Secret");   
+        }
+
+        [SecurityLevel(10)] 
+        public IActionResult SecretHigherLevel()
+        {
+            return View("Secret");   
+        }
+
         [AllowAnonymous]
         public IActionResult Authenticate()
         {
@@ -48,8 +61,9 @@ namespace Basics.Controllers
             {
                 new Claim(ClaimTypes.Name, "Bob"),
                 new Claim(ClaimTypes.Email, "Bob@fmail.com"),
-                new Claim(ClaimTypes.DateOfBirth, "11/11/2000"), // Modelo de autenticação amis novo, é oq eu fiz baseado na data.
+                new Claim(ClaimTypes.DateOfBirth, "11/11/2000"), // Modelo de autenticação mais novo, é o que fiz baseado na data.
                 new Claim(ClaimTypes.Role, "Admin"), // Role é algo antigo, o atual é usar claim, com uma condição especifica do banco.
+                new Claim(DynamicPolicies.SecurityLevel, "7"), // Authorização baseada em um provedor de authorização customizado.
                 new Claim("Grandma.Says", "Very nice boy."), // Quando vc quiser uma claim unica, faça assim.
             };
 
