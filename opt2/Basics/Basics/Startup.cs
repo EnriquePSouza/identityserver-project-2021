@@ -5,6 +5,8 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Basics.AuthorizationRequirements;
 using Basics.Controllers;
+using Basics.Transformer;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -58,7 +60,12 @@ namespace Basics
             });
 
             services.AddScoped<IAuthorizationHandler, CustomRequireClaimHandler>();
+
+            // Handler de recursos de base.
+            // No OperationsController tem todo o processo de configuração e utilização.
             services.AddScoped<IAuthorizationHandler, CookieJarAuthorizationHandler>();
+            
+            services.AddScoped<IClaimsTransformation, ClaimsTransformation>();
 
             // Para poder chamar as views, a parte de front-end apartir dos controllers.
             // Só declarar o controller com a Herança Controller e não ControllerBase.

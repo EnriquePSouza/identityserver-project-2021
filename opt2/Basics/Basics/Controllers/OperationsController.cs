@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Basics.Controllers
 {
+    // Nesse controller está a configuração para permissões 
+    // que ocorrem de acordo com alguma operação especifica.
     public class OperationsController : Controller
     {
         private readonly IAuthorizationService _authorizationService;
