@@ -77,8 +77,18 @@ namespace Basics
 
                 // global authorization filter => Faz com que todas as views sejam aprovadas,
                 // Porem elas precisam de "AllowAnonymous" no momento da autenticação para serem carregadas.
-                config.Filters.Add(new AuthorizeFilter(defaultAuthPolicy));
+                // config.Filters.Add(new AuthorizeFilter(defaultAuthPolicy));
             });
+
+            // Como configurar as rotas das paginas feitas em Razor.
+            services.AddRazorPages()
+                .AddRazorPagesOptions(config =>
+                {
+                    config.Conventions.AuthorizePage("/Razor/Secured");
+                    config.Conventions.AuthorizePage("/Razor/Policy", "Admin");
+                    config.Conventions.AuthorizeFolder("/RazorSecured");
+                    config.Conventions.AllowAnonymousToPage("/RazorSecured/Anon");
+                });
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -103,6 +113,9 @@ namespace Basics
             {
                 // Possibilita utilizar a rota padrão dos controladores.
                 endpoints.MapDefaultControllerRoute();
+                
+                // Possibilita utilizar paginas Razor.
+                endpoints.MapRazorPages();
             });
         }
     }
