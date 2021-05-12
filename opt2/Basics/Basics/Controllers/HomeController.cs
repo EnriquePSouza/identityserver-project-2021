@@ -39,6 +39,7 @@ namespace Basics.Controllers
             return View("Secret");   
         } 
 
+        [AllowAnonymous]
         public IActionResult Authenticate()
         {
             // Coletania para utilizar na memoria com as "condições" para a autenticação do usuário.

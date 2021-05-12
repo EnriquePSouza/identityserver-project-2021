@@ -4,10 +4,12 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Basics.AuthorizationRequirements;
+using Basics.Controllers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
@@ -56,10 +58,20 @@ namespace Basics
             });
 
             services.AddScoped<IAuthorizationHandler, CustomRequireClaimHandler>();
+            services.AddScoped<IAuthorizationHandler, CookieJarAuthorizationHandler>();
 
             // Para poder chamar as views, a parte de front-end apartir dos controllers.
             // Só declarar o controller com a Herança Controller e não ControllerBase.
-            services.AddControllersWithViews();
+            services.AddControllersWithViews(config => {
+                var defaultAuthBuilder = new AuthorizationPolicyBuilder();
+                var defaultAuthPolicy = defaultAuthBuilder
+                    .RequireAuthenticatedUser()
+                    .Build();
+
+                // global authorization filter => Faz com que todas as views sejam aprovadas,
+                // Porem elas precisam de "AllowAnonymous" no momento da autenticação para serem carregadas.
+                config.Filters.Add(new AuthorizeFilter(defaultAuthPolicy));
+            });
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
