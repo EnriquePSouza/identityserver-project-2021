@@ -3,6 +3,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
@@ -86,6 +87,17 @@ namespace Server.Controllers
             // await Response.Body.WriteAsync(responseBytes, 0, responseBytes.Length);
 
             return Ok(responseObject);
+        }
+
+        [Authorize]
+        public IActionResult Validate()
+        {
+            if(HttpContext.Request.Query.TryGetValue("access_token", out var accessToken))
+            {
+                return Ok();
+            }
+
+            return BadRequest();
         }
     }
 }
