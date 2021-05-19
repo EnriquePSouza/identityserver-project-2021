@@ -48,7 +48,8 @@ namespace Server.Controllers
             string grant_type, // fluxo para pedir o token
             string code, // confirmação da autenticação
             string redirect_uri,
-            string client_id)
+            string client_id,
+            string refresh_token)
         {
             // some mechanism for validating the code
 
@@ -69,7 +70,9 @@ namespace Server.Controllers
                 Constants.Audiance,
                 claims,
                 notBefore: DateTime.Now,
-                expires: DateTime.Now.AddMilliseconds(1),
+                expires: grant_type == "refresh_token"
+                    ? DateTime.Now.AddMinutes(5)
+                    : DateTime.Now.AddMilliseconds(1),
                 signingCredentials);
 
             var access_token = new JwtSecurityTokenHandler().WriteToken(token);
