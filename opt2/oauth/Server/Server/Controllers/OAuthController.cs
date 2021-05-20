@@ -81,7 +81,8 @@ namespace Server.Controllers
             {
                 access_token,
                 token_type = "Bearer",
-                raw_claim = "oauthTutorial"
+                raw_claim = "oauthTutorial",
+                refresh_token = "YyMTExNjU1OCwiaWF0IjoxN"
             };
 
             // var responseJson = JsonConvert.SerializeObject(responseObject);
